@@ -8,6 +8,6 @@ Files include:
 - Supplementary Table 3: includes Schmidt hammer sample information (n = 645)
 - Manuscript (post-peer review)
 
-# Abstract
+### Abstract
 
 "Abstract goes here..."
