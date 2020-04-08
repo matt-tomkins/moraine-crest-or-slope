@@ -108,14 +108,14 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     ax.plot(xn, yn - pl2, '0.5', dashes=[9, 3], linewidth=0.5)
 
     # plot points and error bars
-    ax.plot(x_data, y_data, 'k.', markerfacecolor= '#FF8130',
+    ax.plot(x_data, y_data, 'k.', markerfacecolor= '#4495F3',
              markeredgewidth=.5,  markeredgecolor = 'k',
             label='Calibration data (n = 54)', markersize=5)
     ax.errorbar(x_data, y_data, ecolor='k', xerr=x_err, yerr=y_err, fmt=" ", linewidth=0.5, capsize=0)
 
 
     # adds new data and errors bars
-    ax.plot(new_x_data, new_y_data,'k.', markerfacecolor= '#4495F3',
+    ax.plot(new_x_data, new_y_data,'k.', markerfacecolor= '#FF8130',
              markeredgewidth=.5,  markeredgecolor = 'k',
             label = 'New data (n = 15)', markersize = 5)
     ax.errorbar(new_x_data, new_y_data, ecolor='k', xerr=new_x_err, yerr=new_y_err, fmt=" ", linewidth=0.5, capsize=0)
