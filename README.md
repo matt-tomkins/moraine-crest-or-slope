@@ -1,7 +1,9 @@
 # Moraine crest or slope? An analysis of the effects of boulder position on cosmogenic exposure age
 Data and code for the above paper, published in *Journal Name*, available at: www.google.com
 
-<img src="images/Figure_1.png" width="672" style="display: block; margin: auto;" />
+<p align="center">
+	<img width = "460" src="images/Figure_1.png"
+</p>
 
 Files include:
 
