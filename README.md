@@ -5,11 +5,11 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 
 Files include:
 
-- Supplementary Table 1: includes <sup>10</sup>Be sample information (n = 17)
-- Supplementary Table 2: includes <sup>36</sup>Cl sample information (n = 2)
-- Supplementary Table 3: includes Schmidt hammer sample information (n = 645)
-- Supplementary Description: describes the Supplementary Tables above
-- Manuscript (post-peer review)
+- Supplementary Table 1: includes <sup>10</sup>Be sample information (n = 17).
+- Supplementary Table 2: includes <sup>36</sup>Cl sample information (n = 2).
+- Supplementary Table 3: includes Schmidt hammer sample information (n = 645).
+- Supplementary Description: describes the Supplementary Tables above.
+- Code used for orthogonal distance regression ("ODR_code.py").
 
 ### Abstract
 

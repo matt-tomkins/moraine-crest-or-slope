@@ -104,7 +104,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     ax.plot(xn, yn, '#EC472F', label='Logarithmic ODR')
     ax.plot(xn, yn + pl1, '#0076D4', dashes=[9, 4.5], label='1σ Prediction limit (~68%)', linewidth=0.8)
     ax.plot(xn, yn - pl1, '#0076D4', dashes=[9, 4.5], linewidth=0.8)
-    ax.plot(xn, yn + pl2, '0.5', dashes=[9, 3], label='2σ Prediction Limit (~95%)', linewidth=0.5)
+    ax.plot(xn, yn + pl2, '0.5', dashes=[9, 3], label='2σ Prediction limit (~95%)', linewidth=0.5)
     ax.plot(xn, yn - pl2, '0.5', dashes=[9, 3], linewidth=0.5)
 
     # plot points and error bars
@@ -139,7 +139,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     # export the figure
     savefig('pyrenees.png', dpi = 600, bbox_inches='tight')
-    savefig('pyrenees.svg')
+    #savefig('pyrenees.svg')
 
 '''
 Data is now loaded directly from the csv (update working directory)
