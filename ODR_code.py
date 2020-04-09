@@ -9,6 +9,7 @@ References:
     https://www.astro.rug.nl/software/kapteyn/kmpfittutorial.html#confidence-and-prediction-intervals
     https://www.astro.rug.nl/software/kapteyn/EXAMPLES/kmpfit_ODRparabola_confidence.py
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.odr.Output.html
+    
 """
 
 # from sympy import symbols, diff
@@ -141,6 +142,36 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     savefig('pyrenees.png', dpi = 600, bbox_inches='tight')
     #savefig('pyrenees.svg')
 
+
+def predict_ages(x_data, y_data, x_err, y_err, new_x):
+    """
+    Uses prediction interval code above to predict for new values of x
+
+    Doesn't work yet, predicted values are too big...
+    
+    """
+
+    # make function into Model instance (either log or linear)
+    model = Model(log_func)
+
+    # make data into RealData instance
+    data = RealData(x_data, y_data, sx=x_err, sy=y_err)
+
+    # initialise the ODR instance
+    out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
+
+    # Error is around here somewhere
+    # prediction values
+    xn = new_x
+    yn = log_func(out.beta, xn)
+
+    # calculate curve and prediction interval (1 sigma)
+    sigma = prediction_interval(log_func, [log10(xn), 1], xn, yn, max(out.eps), 68., out.beta, out.cov_beta)
+    return yn, sigma
+
+
+
+
 '''
 Data is now loaded directly from the csv (update working directory)
 10Be and 36Cl
@@ -196,3 +227,12 @@ new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
 
 # plot the curve
 plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
+
+'''
+Currently uses example prediction data
+
+'''
+
+
+# prediction?
+Predicted_age,Predicted_uncertainty = predict_ages(x_data, y_data, x_err, y_err, new_x_data)
