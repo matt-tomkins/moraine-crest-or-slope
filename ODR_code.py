@@ -67,7 +67,6 @@ def log_func(beta, x):
     # logarithmic, m * log(x) + c
     return beta[0] * log10(x) + beta[1]
 
-
 def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err):
     """
     * Fit curve using ODR and plot
@@ -79,10 +78,11 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     data = RealData(x_data, y_data, sx=x_err, sy=y_err)
 
     # initialise the ODR instance
-    out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
+    #out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
+    out = ODR(data, model, beta0=[-0.5414, 36.08]).run()
     # out.pprint()
 
-    ''' this only needed to run once as it is static
+    '''this only needed to run once as it is static
     # use sympy to calculate derivatives for each parameter (a and b)
     a, b, x = symbols('a b x')
     diffs = [diff(a * slog10(x) + b, a), diff(a * slog10(x) + b, b)]
@@ -114,13 +114,14 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
             label='Calibration data (n = 54)', markersize=5)
     ax.errorbar(x_data, y_data, ecolor='k', xerr=x_err, yerr=y_err, fmt=" ", linewidth=0.5, capsize=0)
 
-
+    
     # adds new data and errors bars
     ax.plot(new_x_data, new_y_data,'k.', markerfacecolor= '#FF8130',
              markeredgewidth=.5,  markeredgecolor = 'k',
             label = 'New data (n = 15)', markersize = 5)
     ax.errorbar(new_x_data, new_y_data, ecolor='k', xerr=new_x_err, yerr=new_y_err, fmt=" ", linewidth=0.5, capsize=0)
 
+    
     # labels, extents etc.
     ax.set_ylim(0, 60)
     ax.set_xlabel('Mean R-Value')
@@ -224,6 +225,11 @@ new_y_data = New.loc[:, 'CRONUS_Age_2020_03_27'].values
 new_x_err = New.loc[:, 'SH_SEM'].values
 new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
 
+# British Data
+# x_data = array([39.41,49.01,47.52,39.57,36.73,39.25,41.79,42.55,42.49,26.53,30.67,27.88,31,41.08,41.67,40.39,45.7,41.39,41.69,45.4,43.3,39.67,35.84,38.87,28.85,34.47,35.13,35.16,39.57,36.31,36,59.5,63,58.12,63.69,60.79,47.25,46.48,42.94,45.29,46.53,44.76,27.23,30.23,29.53,25.57,28.03,30.27,28.71,29.01,28.81,33.08,38.92,37.84,46.59,47.09,44.4,40.96,44.66,45.47,42.89,40.01,43.64,42.14,40.66])
+# x_err = array([0.9,0.94,1.16,1.33,1.05,0.76,1.26,1.21,0.79,0.86,1.62,1.17,1.13,0.96,0.61,0.7,0.81,0.58,1.14,0.85,0.74,0.8,0.54,0.68,0.52,0.63,0.7,0.63,0.81,0.82,0.6,0.72,0.66,0.53,0.55,0.63,0.45,0.46,0.56,0.54,0.47,0.53,1.08,1.12,1.44,0.9,1.25,1.2,0.53,0.68,1.06,1.32,1.34,1.25,0.88,0.69,0.72,0.96,1.13,1.02,1,1.12,1.22,1.05,1.18])   
+# y_data = array([15.27,12.53,12.89,13.52,13.12,14.46,12.71,13.59,12.08,21.42,18.88,19.26,21.15,14.55,14.21,14.89,11.27,12.09,11.57,12.19,12.8,16.31,19.13,15.69,20.01,15.18,13.62,15.92,16.03,14.47,15.33,2.67,1.58,5.3,0.83,2.31,10.68,10.86,12.11,11.06,10.84,11.52,20.95,20.43,20.53,22.72,20.94,21.31,21.82,21.96,20.01,17.4,15.12,15.91,10.83,8.91,11.03,13.17,12.97,12.64,15.19,14.7,14.11,12.17,13.76])
+# y_err = array([1.2,1.02,1.04,1.3,1.06,1.17,1.03,1.11,0.97,1.81,2.64,2.34,2.9,2.02,1.1,1.36,1.08,1.08,1.03,1.13,1.13,1.39,1.59,1.34,1.67,1.43,1.39,1.84,1.45,1.54,1.44,0.38,0.2,0.55,0.15,0.31,0.84,0.86,0.96,0.88,0.86,0.91,1.87,1.91,2.03,2.16,2.13,2.14,1.86,1.74,1.77,1.51,1.28,1.33,0.93,0.8,0.91,1.17,1.17,1.1,1.38,1.24,1.22,1.05,1.19])
 
 # plot the curve
 plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
