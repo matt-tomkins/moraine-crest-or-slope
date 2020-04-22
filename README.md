@@ -5,6 +5,10 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 	<img width = "460" src="figures/Figure_2_300dpi.png"
 </p>
 
+.caption[
+**Fig.** Studied moraines and boulder flow pathways in the Pyrenees
+]
+
 Files include:
 
 - Supplementary Table 1: includes <sup>10</sup>Be sample information (n = 17).
