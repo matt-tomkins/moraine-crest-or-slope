@@ -2,7 +2,7 @@
 Data and code for the above paper, published in *Journal Name*, available at: www.google.com
 
 <p align="center">
-	<img width = "460" src="images/Figure_1.png"
+	<img width = "460" src="figures/Figure_2_300dpi.png"
 </p>
 
 Files include:
