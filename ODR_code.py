@@ -129,8 +129,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     """
 
     # make data into RealData instance
-    data = RealData(x_data, y_data)
-    #sx=x_err, sy=y_err)
+    data = RealData(x_data, y_data, sx=x_err, sy=y_err)
 
     # initialise the ODR instance
     #out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
@@ -196,7 +195,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     # export the figure
     savefig('pyrenees.png', dpi = 600, bbox_inches='tight')
-    savefig('pyrenees.svg')
+    #savefig('pyrenees.svg')
 
 
 
