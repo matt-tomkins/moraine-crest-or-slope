@@ -5,7 +5,7 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 	<img width = "460" src="figures/Figure_2_300dpi.png"
 </p>
 <p align="center">
-Fig. Studied moraines and associated boulder flow pathways in the Pyrenees
+**Fig.** Studied moraines and associated boulder flow pathways in the Pyrenees
 </p>
 
 Files include:

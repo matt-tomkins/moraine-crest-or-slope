@@ -74,8 +74,63 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     # make function into Model instance (either log or linear)
     model = Model(log_func)
 
+    """
+    The following line has a big(!) impact on the calculated prediction intervals.
+
+    (1) Using:
+        RealData(x_data, y_data) ... gives prediction intervals similar to OLS. 
+
+    (2) Using: (where x_err and y_err are the raw error values). 
+        RealData(x_data, y_data, sx=x_err, sy=y_err) ... gives prediction intervals ~1 ka larger (range = 5.4 ka) but this changes
+        significantly if other values are used (e.g. R value SD instead of standard error of the mean). 
+
+    
+    Option (1) is valid (e.g. https://www.tutorialspoint.com/scipy/scipy_odr.htm) and is a standard orthogonal regression, but one which
+    doesn't explicitly take into account the known errors. 
+        
+    Option (2) is preferable, because it shows we're taking errors fully into account, but I need to decide the appropriate values to use.
+
+    One reason why Option (2) increases the error is that ODR assumes that ratio of XY errors = 1, as follows:
+
+    "This approach assumes that although both variables are subject to measurement & equation error,
+    the total error on Y is equal to the total error on X (in other words var(δX) + var(εX) = var (δY + var(εY)). Hence λ = 1.
+    The two variables must obviously be measured in the same units for this to stand some chance of being true.
+    The method minimizes the sum of the squared perpendicular distances of points to the line."
+    https://influentialpoints.com/Training/errors-in-variables_regression-principles-properties-assumptions.htm
+
+    Deming regression is very similar, but does *not* assume that λ = 1. Unfortunately, there's no obvious Python implementation.
+    See Slide 7: http://www2.agroparistech.fr/podcast/IMG/pdf/chimiometrie_2017_bivregbls_mberger-bgfrancq_final.pdf
+
+    Perhaps the best way forward is to normalise the errors beforehand i.e. error/value, which has two benefits:
+    (i) isolates TCN colinearity (as age increases, errors increase)
+    (ii) will hopefully ensure that λ ~ 1.
+
+    For the X values (Schmidt hammer), standard deviation / mean R. The mean of these values = 0.120268131...
+
+    For the Y values (Age), external error / exposure age. The mean of these values = 0.113326221...
+
+    Pretty similar!
+
+    Using these values gives prediction errors (1 sigma) of ~2.1 ka, which is larger than Option (1).
+
+    45/54 = 83% within 1 sigma.
+    54/54 = 100% within 2 sigma.
+
+    So based on the 68-95-99.7 rule, our prediction limits are actually wider (more tolerant) than expected.
+
+    Using the standard orthogonal, without errors:
+
+    37/54 = 70% within 1 sigma.
+    52/54 = 96% within 2 sigma.
+    54/54 = 100% within 3 sigma.
+
+    So Option (1) is a better approximation of the 68-95-99.7 rule, but Option (2) is more robust. 
+    
+    """
+
     # make data into RealData instance
-    data = RealData(x_data, y_data, sx=x_err, sy=y_err)
+    data = RealData(x_data, y_data)
+    #sx=x_err, sy=y_err)
 
     # initialise the ODR instance
     #out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
@@ -141,35 +196,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     # export the figure
     savefig('pyrenees.png', dpi = 600, bbox_inches='tight')
-    #savefig('pyrenees.svg')
-
-
-def predict_ages(x_data, y_data, x_err, y_err, new_x):
-    """
-    Uses prediction interval code above to predict for new values of x
-
-    Doesn't work yet, predicted values are too big...
-    
-    """
-
-    # make function into Model instance (either log or linear)
-    model = Model(log_func)
-
-    # make data into RealData instance
-    data = RealData(x_data, y_data, sx=x_err, sy=y_err)
-
-    # initialise the ODR instance
-    out = ODR(data, model, beta0=[-0.89225534, 59.09509794]).run()
-
-    # Error is around here somewhere
-    # prediction values
-    xn = new_x
-    yn = log_func(out.beta, xn)
-
-    # calculate curve and prediction interval (1 sigma)
-    sigma = prediction_interval(log_func, [log10(xn), 1], xn, yn, max(out.eps), 68., out.beta, out.cov_beta)
-    return yn, sigma
-
+    savefig('pyrenees.svg')
 
 
 
@@ -198,8 +225,8 @@ Be = pd.read_csv('Supplementary_Table_1_10Be.csv', encoding = "ISO-8859-1")
 Cl = pd.read_csv('Supplementary_Table_2_36Cl.csv', encoding = "ISO-8859-1")
 # Simplifies to key variables
 cols = ['Group', 'Landform/Region','Publication', 'Isotope', 'Sample_name',
-        'SH_Mean','SH_SEM', 'CRONUS_Age_2020_03_27','CRONUS_Internal_2020_03_27',
-        'CRONUS_External_2020_03_27']
+        'SH_Mean','SH_SEM','SH_STD', 'SH_Percent', 'CRONUS_Age_2020_03_27','CRONUS_Internal_2020_03_27',
+        'CRONUS_External_2020_03_27', 'Age_Percent']
 Be = Be[cols]
 Cl = Cl[cols]
 
@@ -217,28 +244,15 @@ New = data.loc[data['Group'] == 'New moraine samples']
 x_data = Calibration.loc[:, 'SH_Mean'].values
 y_data = Calibration.loc[:, 'CRONUS_Age_2020_03_27'].values
 x_err = Calibration.loc[:, 'SH_SEM'].values
+# Using internal errors has only a minor impact on the computed prediction intervals (~0.1 ka). 
 y_err = Calibration.loc[:, 'CRONUS_External_2020_03_27'].values
 
 # load new data to be plotted
 new_x_data = New.loc[:, 'SH_Mean'].values
 new_y_data = New.loc[:, 'CRONUS_Age_2020_03_27'].values
-new_x_err = New.loc[:, 'SH_SEM'].values
-new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
-
-# British Data
-# x_data = array([39.41,49.01,47.52,39.57,36.73,39.25,41.79,42.55,42.49,26.53,30.67,27.88,31,41.08,41.67,40.39,45.7,41.39,41.69,45.4,43.3,39.67,35.84,38.87,28.85,34.47,35.13,35.16,39.57,36.31,36,59.5,63,58.12,63.69,60.79,47.25,46.48,42.94,45.29,46.53,44.76,27.23,30.23,29.53,25.57,28.03,30.27,28.71,29.01,28.81,33.08,38.92,37.84,46.59,47.09,44.4,40.96,44.66,45.47,42.89,40.01,43.64,42.14,40.66])
-# x_err = array([0.9,0.94,1.16,1.33,1.05,0.76,1.26,1.21,0.79,0.86,1.62,1.17,1.13,0.96,0.61,0.7,0.81,0.58,1.14,0.85,0.74,0.8,0.54,0.68,0.52,0.63,0.7,0.63,0.81,0.82,0.6,0.72,0.66,0.53,0.55,0.63,0.45,0.46,0.56,0.54,0.47,0.53,1.08,1.12,1.44,0.9,1.25,1.2,0.53,0.68,1.06,1.32,1.34,1.25,0.88,0.69,0.72,0.96,1.13,1.02,1,1.12,1.22,1.05,1.18])   
-# y_data = array([15.27,12.53,12.89,13.52,13.12,14.46,12.71,13.59,12.08,21.42,18.88,19.26,21.15,14.55,14.21,14.89,11.27,12.09,11.57,12.19,12.8,16.31,19.13,15.69,20.01,15.18,13.62,15.92,16.03,14.47,15.33,2.67,1.58,5.3,0.83,2.31,10.68,10.86,12.11,11.06,10.84,11.52,20.95,20.43,20.53,22.72,20.94,21.31,21.82,21.96,20.01,17.4,15.12,15.91,10.83,8.91,11.03,13.17,12.97,12.64,15.19,14.7,14.11,12.17,13.76])
-# y_err = array([1.2,1.02,1.04,1.3,1.06,1.17,1.03,1.11,0.97,1.81,2.64,2.34,2.9,2.02,1.1,1.36,1.08,1.08,1.03,1.13,1.13,1.39,1.59,1.34,1.67,1.43,1.39,1.84,1.45,1.54,1.44,0.38,0.2,0.55,0.15,0.31,0.84,0.86,0.96,0.88,0.86,0.91,1.87,1.91,2.03,2.16,2.13,2.14,1.86,1.74,1.77,1.51,1.28,1.33,0.93,0.8,0.91,1.17,1.17,1.1,1.38,1.24,1.22,1.05,1.19])
+new_x_err = New.loc[:, 'SH_Percent'].values
+new_y_err = New.loc[:, 'Age_Percent'].values
 
 # plot the curve
 plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
 
-'''
-Currently uses example prediction data
-
-'''
-
-
-# prediction?
-Predicted_age,Predicted_uncertainty = predict_ages(x_data, y_data, x_err, y_err, new_x_data)
