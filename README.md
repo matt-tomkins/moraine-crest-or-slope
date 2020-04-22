@@ -3,11 +3,10 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 
 <p align="center">
 	<img width = "460" src="figures/Figure_2_300dpi.png"
-	
-	Fig. Studied moraines and associated boulder flow pathways in the Pyrenees
 </p>
-
-
+<p align="center">
+Fig. Studied moraines and associated boulder flow pathways in the Pyrenees
+</p>
 
 Files include:
 
