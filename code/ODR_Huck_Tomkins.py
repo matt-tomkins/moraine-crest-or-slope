@@ -74,45 +74,13 @@ def log_func(beta, x):
     # logarithmic, m * log(x) + c
     return beta[0] * log10(x) + beta[1]
 
-def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err):
+def standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err):
     """
     * Fit curve using ODR and plot
     """
     # make function into Model instance (either log or linear)
     model = Model(log_func)
 
-    """
-    The following line has a big(!) impact on the calculated prediction intervals.
-
-    (1) Using:
-        RealData(x_data, y_data) ... gives prediction intervals similar to OLS. 
-
-    (2) Using: (where x_err and y_err are the raw error values). 
-        RealData(x_data, y_data, sx=x_err, sy=y_err) ... gives prediction intervals ~1 ka larger (range = 5.4 ka) but this changes
-        significantly if other values are used (e.g. R value SD instead of standard error of the mean). 
-
-    
-    Option (1) is valid (e.g. https://www.tutorialspoint.com/scipy/scipy_odr.htm) and is a standard orthogonal regression, but one which
-    doesn't explicitly take into account the known errors. 
-        
-    Option (2) is preferable, because it shows we're taking errors fully into account, but I need to decide the appropriate values to use.
-
-    One reason why Option (2) increases the error is that ODR assumes that ratio of XY errors = 1, as follows:
-
-    "This approach assumes that although both variables are subject to measurement & equation error,
-    the total error on Y is equal to the total error on X (in other words var(δX) + var(εX) = var (δY + var(εY)). Hence λ = 1.
-    The two variables must obviously be measured in the same units for this to stand some chance of being true.
-    The method minimizes the sum of the squared perpendicular distances of points to the line."
-    https://influentialpoints.com/Training/errors-in-variables_regression-principles-properties-assumptions.htm
-
-    Deming regression is very similar, but does *not* assume that λ = 1. Unfortunately, there's no obvious Python implementation.
-    See Slide 7: http://www2.agroparistech.fr/podcast/IMG/pdf/chimiometrie_2017_bivregbls_mberger-bgfrancq_final.pdf
-
-    Perhaps the best way forward is to normalise the errors beforehand i.e. error/value, which has two benefits:
-    (i) isolates TCN colinearity (as age increases, errors increase)
-    (ii) will hopefully ensure that λ ~ 1.
-
-    """
     # make data into RealData instance
     #data = RealData(x_data, y_data, sx=x_err, sy=y_err)
     #data = Data(x_data, y_data, wd=x_err, we=y_err)                 
@@ -169,10 +137,7 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     ax.set_ylabel('Age (ka)')
     ax.set_title('Orthogonal Distance Regression and Prediction Limits', pad = 11)
 
-
     # configure legend
-    #ax.legend(bbox_to_anchor=(0.99, 0.99), borderaxespad=0., frameon=False,
-         #     fontsize=10)
     ax.legend(frameon=False,
               fontsize=8)
 
@@ -183,171 +148,34 @@ def plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     # export the figure
     savefig('pyrenees_absolute.png', dpi = 600, bbox_inches='tight')
     #savefig('pyrenees2.svg')
+    
 
-      
+def monte_carlo_odr(x_data, y_data, x_err, y_err):
 
-def bootstrap_ODR(x_data, y_data, x_err, y_err):
+    """
+    Monte Carlo Orthogonal Distance Regression for Schmidt Hammer exposure dating
+    @author: matt-tomkins
+
+    Improves on standard ODR by explicitly incorporating XY errors, but without the complications
+    introduced by weighting.
+
+    1) Randomises the data (i = 1000) based on values (x, y) and associated errors (x_err, y_err).
+    2) Constructs a standard logged OLS regression (used for ODR beta estimates).
+    3) Detects outliers using internally standardized residuals from the OLS.  Those > 2 sigma are rejected. 
+    4) Constructs an ODR and saves model coefficients (beta, covariance matrix, errors)
+    5) Takes the means of these coefficients for final ODR model construction  
+    
+    """
 
     # Generates results files
-    Result = []
-    Prediction = []
-
-    # create a figure to draw on and add a subplot
-    fig, ax = subplots(1)
-
-    # labels, extents etc.
-    ax.set_xlabel('Mean R-Value')
-    ax.set_ylabel('Age (ka)')
-    ax.set_title('Bootstrapped ODR', pad = 11)
-
-    # make function into Model instance (either log or linear)
-    model = Model(log_func)
-
-    # Sets seed for reproducible results
-    np.random.seed(214)
-
-    # 1000 iterations                
-    for i in range(1000):
-
-        # Randomises the data (mean, sd)
-        x = np.random.normal(x_data, x_err)
-        y = np.random.normal(y_data, y_err)
-
-        # Adds constant for stats model intercept
-        X = sm.add_constant(x)
-
-        
-        # 100 iterations
-        for i in range(100):
-            # OLS model
-            linear_model = sm.OLS(y, X)
-            results = linear_model.fit()
-            
-            # creates instance of influence
-            influence = results.get_influence()
-            # calculates externally standardized residuals
-            St_Res = influence.resid_studentized_internal
-
-
-
-            ''' Old version using linregress
-            # Simple OLS for beta values
-            slope, intercept, r_value, p_value, std_err = linregress(log10(x[:]),y[:])
-
-            # This calculates the predicted value for each observed value
-            obs_values = y
-            pred_values = slope * log10(x) + intercept
-
-            # This prints the residual for each pair of observations
-            Residual = obs_values - pred_values
-
-        
-
-            Can't use Cooks distance because there "are" influential observations (i.e. > 30 ka). 
-
-            # stats cooks d
-            cooks_d = influence.cooks_distance
-
-            M = np.max(cooks_d[0])
-
-            res = [idx for idx, val in enumerate(cooks_d[0]) if val > 4/len(X)]
-
-            '''
-        
-
-            # Finds max residual
-            M = np.max(abs(St_Res))
-
-            # If any are larger than 2 (?)
-            if M > 2:
-                # Find their index
-                res = [idx for idx, val in enumerate(St_Res) if val > 2 or val < -2]
-                # Delete
-                x = np.delete(x, res)
-                X = np.delete(X, res, axis = 0)
-                y = np.delete(y, res)
-            # If none are large, continue
-            else:
-                slope = results.params[1]
-                intercept = results.params[0]
-                continue
-        
-        # New data and model
-        data = Data(x, y)
-        # Job = 0, explicit orthogonal
-        out = ODR(data, model, beta0=[slope, intercept], job=0).run()
-
-        # fit model using ODR params (from min to max of original data for consistency)
-        xn = linspace(min(x_data), max(x_data), 1000)
-        yn = log_func(out.beta, xn)
-
-        # calculate curve and confidence bands
-        pl1 = prediction_interval(log_func, [log10(xn), 1], xn, yn, max(out.eps), 68., out.beta, out.cov_beta)
-        
-        # Plots iteratively
-        ax.plot(xn, yn, '#EC472F', alpha = 0.1)
-        #ax.plot(xn, yn + pl1, '#0076D4', linewidth=0.8, alpha = 0.1)
-        #ax.plot(xn, yn - pl1, '#0076D4', linewidth=0.8, alpha = 0.1)
-
-        # Appends results
-        Result.append(yn)
-        Prediction.append(pl1)
-
-    # Returns "representative" bootstrapped values
-    Central_Estimate = np.median(Result, axis = 0)
-    Modal = np.median(Prediction, axis = 0)
-
-    # One option using percentiles.
-    #p95 = np.percentile(Result, 95, axis = 0)
-    #p5 = np.percentile(Result, 5, axis = 0)
-
-    # Returns maximum of Prediction
-    #Prediction = np.round(Prediction,1)
-    #Modal = mode(Prediction, axis = 0)[0]
-    #Modal = Modal.flatten()
-
-    ax.plot(xn, Central_Estimate, '#000000', alpha = 1)
-    ax.plot(xn, Central_Estimate+Modal, '#000000', dashes=[9, 4.5], linewidth=0.8, alpha = 1)
-    ax.plot(xn, Central_Estimate-Modal, '#000000', dashes=[9, 4.5], linewidth=0.8, alpha = 1)
-    
-    # Adds legend
-    #ax.legend(frameon=False,
-     #         fontsize=8)
-    
-    # plot points and error bars
-    ax.plot(x_data, y_data, 'k.', markerfacecolor= '#4495F3',
-             markeredgewidth=.5,  markeredgecolor = 'k',
-            label='Calibration data (n = 54)', markersize=5)
-    ax.errorbar(x_data, y_data, ecolor='k', xerr=x_err, yerr=y_err, fmt=" ", linewidth=0.5, capsize=0)
-
-    # Sets axis limit
-    ax.set_ylim(0, 60)
-    
-    # Sets axis ratio to 1
-    ratio = 1
-    ax.set_aspect(1.0/ax.get_data_ratio()*ratio)
-
-    savefig('pyrenees_bootstrap_prediction.png', dpi = 600, bbox_inches='tight')
-
-    return Result, Prediction, Central_Estimate, Modal
-
-
-def better_bootstrap_ODR(x_data, y_data, x_err, y_err):
-
-    # Generates results files
-    Result = []
-    Prediction = []
     betas = []
     covariances = []
     eps = []
 
-    # create a figure to draw on and add a subplot
-    fig, ax = subplots(1)
-
     # make function into Model instance (either log or linear)
     model = Model(log_func)
 
-    # Sets seed for reproducible results
+    # Sets seed for reproducible results (!)
     np.random.seed(214)
 
     # 1000 iterations                
@@ -414,6 +242,9 @@ def better_bootstrap_ODR(x_data, y_data, x_err, y_err):
     pl1 = prediction_interval(log_func, [log10(xn), 1], xn, yn, Eps, 68., Beta, Covariance)
     pl2 = prediction_interval(log_func, [log10(xn), 1], xn, yn, Eps, 95., Beta, Covariance)
 
+    # create a figure to draw on and add a subplot
+    fig, ax = subplots(1)
+
     # plot y calculated from px against de-logged x (and 1 and 2 sigma prediction intervals)
     ax.plot(xn, yn, '#EC472F', label='Logarithmic ODR')
     ax.plot(xn, yn + pl1, '#0076D4', dashes=[9, 4.5], label='1σ Prediction limit (~68%)', linewidth=0.8)
@@ -443,10 +274,8 @@ def better_bootstrap_ODR(x_data, y_data, x_err, y_err):
 
     # export the figure
     savefig('pyrenees_Monte_Carlo.png', dpi = 600, bbox_inches='tight')
+
     return pl1
-
-
-    
 
 
 '''
@@ -506,12 +335,11 @@ new_x_err = New.loc[:, 'SH_SEM'].values
 new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
 
 
-# plot the curve
-plot_shed_curve(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
+# plot the curve, standard ODR
+standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
 
-# Bootstrapping!
-Result, Prediction, Central, Modal = bootstrap_ODR(x_data, y_data, x_err, y_err)
+# plot the curve, Monte Carlo ODR
+pl1 = monte_carlo_odr(x_data, y_data, x_err, y_err)
 
-pl1 = better_bootstrap_ODR(x_data, y_data, x_err, y_err)
 
 
