@@ -112,9 +112,9 @@ def standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err
 
     # plot y calculated from px against de-logged x (and 1 and 2 sigma prediction intervals)
     ax.plot(xn, yn, '#EC472F', label='Logarithmic ODR')
-    ax.plot(xn, yn + pl1, '#0076D4', dashes=[9, 4.5], label='1σ Prediction limit (~68%)', linewidth=0.8)
+    ax.plot(xn, yn + pl1, '#0076D4', dashes=[9, 4.5], label='1σ Prediction limit', linewidth=0.8)
     ax.plot(xn, yn - pl1, '#0076D4', dashes=[9, 4.5], linewidth=0.8)
-    ax.plot(xn, yn + pl2, '0.5', dashes=[9, 3], label='2σ Prediction limit (~95%)', linewidth=0.5)
+    ax.plot(xn, yn + pl2, '0.5', dashes=[9, 3], label='2σ Prediction limit', linewidth=0.5)
     ax.plot(xn, yn - pl2, '0.5', dashes=[9, 3], linewidth=0.5)
 
     # plot points and error bars
@@ -128,14 +128,15 @@ def standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err
     ax.plot(new_x_data, new_y_data,'k.', markerfacecolor= '#FF8130',
              markeredgewidth=.5,  markeredgecolor = 'k',
             label = 'New data (n = 15)', markersize = 5)
-    ax.errorbar(new_x_data, new_y_data, ecolor='k', xerr=new_x_err, yerr=new_y_err, fmt=" ", linewidth=0.5, capsize=0)
+    ax.errorbar(new_x_data, new_y_data, ecolor='k', xerr=new_x_err, yerr=new_y_err,
+                fmt=" ", linewidth=0.5, capsize=0)
 
     
     # labels, extents etc.
     ax.set_ylim(0, 60)
-    ax.set_xlabel('Mean R-Value')
+    ax.set_xlabel('Mean R-value')
     ax.set_ylabel('Age (ka)')
-    ax.set_title('Orthogonal Distance Regression and Prediction Limits', pad = 11)
+    ax.set_title('Orthogonal Distance Regression', pad = 11)
 
     # configure legend
     ax.legend(frameon=False,
@@ -150,7 +151,7 @@ def standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err
     #savefig('pyrenees2.svg')
     
 
-def monte_carlo_odr(x_data, y_data, x_err, y_err):
+def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err):
 
     """
     Monte Carlo Orthogonal Distance Regression for Schmidt Hammer exposure dating
@@ -257,23 +258,33 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err):
              markeredgewidth=.5,  markeredgecolor = 'k',
             label='Calibration data (n = 54)', markersize=5)
     ax.errorbar(x_data, y_data, ecolor='k', xerr=x_err, yerr=y_err, fmt=" ", linewidth=0.5, capsize=0)
-    
+
+    # adds new data and errors bars
+    ax.plot(new_x_data, new_y_data,'k.', markerfacecolor= '#FF8130',
+             markeredgewidth=.5,  markeredgecolor = 'k',
+            label = 'New data (n = 15)', markersize = 5)
+    ax.errorbar(new_x_data, new_y_data, ecolor='k', xerr=new_x_err, yerr=new_y_err, fmt=" ", linewidth=0.5, capsize=0)
+
     # labels, extents etc.
     ax.set_ylim(0, 60)
-    ax.set_xlabel('Mean R-Value')
+    ax.set_xlabel('Mean R-value')
     ax.set_ylabel('Age (ka)')
-    ax.set_title('Monte-Carlo Orthogonal Distance Regression', pad = 11)
+    #ax.set_title('Monte-Carlo Orthogonal Distance Regression', pad = 11)
+    ax.tick_params(direction = 'in')
+    ax.tick_params(bottom=True, top=True, left=True, right=True)
+    ax.tick_params(labelbottom=True, labeltop=False, labelleft=True, labelright=False)
 
     # configure legend
     ax.legend(frameon=False,
-              fontsize=8)
+              fontsize=7)
 
     # Sets axis ratio to 1
     ratio = 1
     ax.set_aspect(1.0/ax.get_data_ratio()*ratio)
 
     # export the figure
-    savefig('pyrenees_Monte_Carlo.png', dpi = 600, bbox_inches='tight')
+    fig.set_size_inches(3.2, 3.2)
+    savefig('pyrenees_Monte_Carlo.png', dpi = 900, bbox_inches='tight')
 
     return pl1
 
@@ -339,7 +350,7 @@ new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
 standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
 
 # plot the curve, Monte Carlo ODR
-pl1 = monte_carlo_odr(x_data, y_data, x_err, y_err)
+pl1 = monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
 
 
 

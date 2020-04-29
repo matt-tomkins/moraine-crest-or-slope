@@ -2,18 +2,17 @@
 Data and code for the above paper, published in *Journal Name*, available at: www.google.com
 
 <p align="center">
-	<img width = "460" src="figures/Figure_2_300dpi.png"
+	<img width = "460" src="figures/Figure_5_900dpi.png"
 </p>
-<div align="center">**Fig.** Studied moraines and associated boulder flow pathways in the Pyrenees</div>
+<div align="center">**Fig.** Monte Carlo simulated Orthogonal Distance Regression of 54 TCN-SH calibration points</div>
 
 
-Files include:
+Folders include:
 
-- Supplementary Table 1: includes <sup>10</sup>Be sample information (n = 17).
-- Supplementary Table 2: includes <sup>36</sup>Cl sample information (n = 2).
-- Supplementary Table 3: includes Schmidt hammer sample information (n = 645).
-- Supplementary Description: describes the Supplementary Tables above.
-- Code used for orthogonal distance regression ("ODR_code.py").
+- **Data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders
+- **Code**: Python code used for Monte Carlo simulated Orthogonal Distance Regression (ODR)
+- **Figures**: Latest manuscript figures 
+- **Manuscript**: Latest version of the above paper (pre-peer review)
 
 ### Abstract
 
