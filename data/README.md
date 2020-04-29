@@ -2,7 +2,7 @@
 Data for "Moraine crest or slope? An analysis of the effects of boulder position on cosmogenic exposure age"
 
 <p align="center">
-	<img width = "460" src="moraine-paper-2020/images/pseudo.png"
+	<img width = "460" src="./images/pseudo.png"
 </p>
 
 **Files** include:
