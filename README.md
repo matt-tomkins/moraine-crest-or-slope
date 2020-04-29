@@ -4,15 +4,15 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 <p align="center">
 	<img width = "460" src="figures/Figure_5_900dpi.png"
 </p>
-<div align="center">**Fig.** Monte Carlo simulated Orthogonal Distance Regression of 54 TCN-SH calibration points</div>
+<div align="center">Monte Carlo simulated Orthogonal Distance Regression of 54 TCN-SH calibration points</div>
 
 
 Folders include:
 
-- **Data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders
-- **Code**: Python code used for Monte Carlo simulated Orthogonal Distance Regression (ODR)
-- **Figures**: Latest manuscript figures 
-- **Manuscript**: Latest version of the above paper (pre-peer review)
+- **code**: Python code used for Monte Carlo simulated Orthogonal Distance Regression (ODR)
+- **data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders
+- **figures**: Latest manuscript figures 
+- **manuscript**: Latest version of the above paper (pre-peer review)
 
 ### Abstract
 
