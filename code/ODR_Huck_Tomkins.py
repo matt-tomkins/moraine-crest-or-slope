@@ -9,12 +9,13 @@ References:
     https://www.astro.rug.nl/software/kapteyn/kmpfittutorial.html#confidence-and-prediction-intervals
     https://www.astro.rug.nl/software/kapteyn/EXAMPLES/kmpfit_ODRparabola_confidence.py
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.odr.Output.html
+    http://www.ieap.uni-kiel.de/et/people/wimmer/teaching/stats/statistics.pdf
     
 """
 
 # from sympy import symbols, diff
 # from sympy.codegen.cfunctions import log10 as slog10
-from scipy.stats import t, mode, linregress, truncnorm
+from scipy.stats import t, mode, linregress
 from scipy.odr import ODR, Model, RealData, Data
 from matplotlib.pyplot import subplots, savefig, rcParams
 import matplotlib.pyplot as plt
@@ -25,6 +26,8 @@ import os
 import random
 import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import matplotlib.patches as mpatches
 
 lm = LinearRegression()
 
@@ -172,6 +175,7 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     betas = []
     covariances = []
     eps = []
+    counts =[]
 
     # make function into Model instance (either log or linear)
     model = Model(log_func)
@@ -229,11 +233,12 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
         betas.append(out.beta)
         eps.append(max(out.eps))
         covariances.append(out.cov_beta)
+        counts.append(len(x))
 
-    # Takes the mean of the model estimates
-    Beta = np.mean(betas, axis = 0)
-    Eps = np.mean(eps, axis = 0)
-    Covariance = np.mean(covariances, axis = 0)
+    # Takes the median of the model estimates
+    Beta = np.median(betas, axis = 0)
+    Eps = np.median(eps, axis = 0)
+    Covariance = np.median(covariances, axis = 0)
 
     # fit model using new beta, original x scale for consistency
     xn = linspace(min(x_data), max(x_data), 1000)
@@ -286,8 +291,124 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
     fig.set_size_inches(3.2, 3.2)
     savefig('pyrenees_Monte_Carlo.png', dpi = 900, bbox_inches='tight')
 
-    return pl1
+    return betas, eps, covariances, counts, pl1
 
+
+def plot_coefficients(Beta, Eps, Covariance):
+    
+    # Converts to useful format
+    beta = np.array(Beta)
+    cov1 = np.array([i[0] for i in Covariance])
+    cov2 = np.array([i[1] for i in Covariance])
+
+    # Sets up axes
+    fig, ax = plt.subplots(3, 2, sharey = 'row', figsize=(6,9))
+    ax1, ax2, ax3, ax4, ax5, ax6 = ax.flatten()
+
+    # plots data (%)
+    n, bins, patches = ax1.hist(beta[:,0], weights=(np.ones(len(beta[:,0])) / len(beta[:,0]))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+    n, bins, patches = ax2.hist(beta[:,1], weights=(np.ones(len(beta[:,1])) / len(beta[:,1]))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+    n, bins, patches = ax3.hist(cov1[:,0], weights=(np.ones(len(cov1[:,0])) / len(cov1[:,0]))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+    n, bins, patches = ax4.hist(cov1[:,1], weights=(np.ones(len(cov1[:,1])) / len(cov1[:,1]))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+    n, bins, patches = ax5.hist(cov2[:,1], weights=(np.ones(len(cov2[:,1])) / len(cov2[:,1]))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+    n, bins, patches = ax6.hist(Eps, weights=(np.ones(len(Eps)) / len(Eps))*100, bins = 25, ec = "#000000", color = "#4E9DFF")
+
+    # Adds median values
+    ax1.axvline(x=np.median(beta[:,0]), color = '#EC472F')
+    ax2.axvline(x=np.median(beta[:,1]), color = '#EC472F')
+    ax3.axvline(x=np.median(cov1[:,0]), color = '#EC472F')
+    ax4.axvline(x=np.median(cov1[:,1]), color = '#EC472F')
+    ax5.axvline(x=np.median(cov2[:,1]), color = '#EC472F')
+    ax6.axvline(x=np.median(Eps), color = '#EC472F', ymax = 0.85)
+    
+    # Sets labels
+    #ax1.set_xlabel(r'Slope $\beta$', labelpad=1)
+    ax1.set_title(r'Slope $\beta$', position=(0.82, 0.85))
+    ax1.set_ylabel('Frequency (%)')
+    ax2.set_title(r'Intercept $\beta$', position=(0.22, 0.85))
+    #ax2.set_xlabel(r'Intercept $\beta$', labelpad=1)
+    ax3.set_title(r'Covariance $W$', position=(0.72, 0.85))
+    #ax3.set_xlabel(r'Covariance $W$', labelpad=1.5)
+    ax3.set_ylabel('Frequency (%)')
+    ax4.set_title(r'Covariance $D$', position=(0.27, 0.85))
+    #ax4.set_xlabel(r'Covariance $D$', labelpad=1.5)
+    ax5.set_title(r'Covariance $E$', position=(0.72, 0.85))
+    #ax5.set_xlabel(r'Covariance $E$', labelpad=1.5)
+    ax5.set_ylabel('Frequency (%)')
+    ax6.set_title('Maximum residual', position=(0.35, 0.85))
+    #ax6.set_xlabel('Maximum residual', labelpad=1.5)
+
+
+    fig.subplots_adjust(left=0.1)
+    # saves
+    savefig('pyrenees_coefficients.png', dpi = 900, bbox_inches='tight')
+
+def tcn_errors(y_data,y_err,y_internal, facility):
+    '''
+    # Weighted errors (1/err^2)
+    WE = 1/y_err**2
+
+    # Sets up axes
+    fig, ax = plt.subplots(1, 2, figsize=(6,3))
+    ax1, ax2 = ax.flatten()
+    ax3 = inset_axes(ax2, width="45%", height="45%")
+    
+    fig.tight_layout(pad=1.5)
+
+    # Draws data
+    ax1.plot(y_data, y_err,'k.', markerfacecolor= '#4E9DFF',
+             markeredgewidth=.5,  markeredgecolor = 'k', markersize = 6)
+
+    ax2.plot(y_data, WE,'k.', markerfacecolor= '#4E9DFF',
+             markeredgewidth=.5,  markeredgecolor = 'k', markersize = 6)
+    
+    ax3.plot(y_data, WE,'k.', markerfacecolor= '#4E9DFF',
+             markeredgewidth=.5,  markeredgecolor = 'k', markersize = 4)
+
+    # Labels, titles
+    ax2.set_yscale('log')
+    ax1.set_xlabel("Age (ka)")
+    ax1.set_ylabel("External age uncertainty (ka)")
+    ax2.set_xlabel("Age (ka)")
+    ax2.set_ylabel("Weights (log)", labelpad = 1)
+    ax3.set_ylabel("Weights", fontsize=9, labelpad = 2)
+    ax3.tick_params(labelsize=8)
+
+    ax1.text(0.03, 0.90, "A", fontweight="bold", fontsize = 16, transform=ax1.transAxes)
+    ax2.text(0.07, 0.90, "B", fontweight="bold", fontsize = 16, transform=ax2.transAxes)
+    ax3.text(0.89, 0.88, "C", fontweight="bold", fontsize = 9, transform=ax3.transAxes)
+    
+    #savefig('pyrenees_collinearity.png', dpi = 900, bbox_inches='tight')
+    '''
+
+    # Merges data
+    df = pd.DataFrame(dict(error=y_internal, percent=y_internal/y_data*100, facility=facility))
+    df.loc[df['facility'].str.contains("AST"),'colors'] = '#3897F8'
+    df.loc[df['facility'].str.contains("Tand"),'colors'] = '#F83838'
+
+    groups = df.groupby('facility')
+
+    # create a figure to draw on and add a subplot
+    fig, ax = plt.subplots(1, 1, figsize=(3,3))
+
+    # Plotting by category
+    for name, groups in groups:
+        ax.plot(groups.error, groups.percent, marker='o', linestyle='', ms=6, label=name, markeredgecolor = 'k', markeredgewidth = '.5')
+
+
+    # Aesthetics
+    leg = plt.legend()
+    leg.get_frame().set_edgecolor('k')
+    leg.get_frame().set_linewidth(.5)
+    ax.set_xlabel("Internal age uncertainty (ka)")
+    ax.set_ylabel("Internal uncertainty / Exposure age (%)")
+
+    
+    savefig('pyrenees_errors.png', dpi = 900, bbox_inches='tight')
+
+
+# Plots TCN errors
+tcn_errors(y_data,y_err, y_internal, facility)
 
 '''
 Data is now loaded directly from the csv (update working directory)
@@ -312,7 +433,7 @@ os.chdir(r'C:\Users\Matt\Desktop\Repo\moraine-paper-2020')
 Be = pd.read_csv('data\Supplementary_Table_1_10Be.csv', encoding = "ISO-8859-1")
 Cl = pd.read_csv('data\Supplementary_Table_2_36Cl.csv', encoding = "ISO-8859-1")
 # Simplifies to key variables
-cols = ['Group', 'Landform/Region','Publication', 'Isotope', 'Sample_name',
+cols = ['Group', 'Landform/Region','Publication', 'Isotope', 'Facility', 'Sample_name',
         'SH_Mean','SH_SEM','SH_STD', 'SH_Percent', 'CRONUS_Age_2020_03_27','CRONUS_Internal_2020_03_27',
         'CRONUS_External_2020_03_27', 'Age_Percent']
 Be = Be[cols]
@@ -338,6 +459,9 @@ x_err = Calibration.loc[:, 'SH_SEM'].values
 # Using internal errors has only a minor impact on the computed prediction intervals (~0.1 ka). 
 y_err = Calibration.loc[:, 'CRONUS_External_2020_03_27'].values
 
+y_internal = Calibration.loc[:, 'CRONUS_Internal_2020_03_27'].values
+facility = Calibration.loc[:, 'Facility'].values
+
 
 # load new data to be plotted
 new_x_data = New.loc[:, 'SH_Mean'].values
@@ -350,7 +474,12 @@ new_y_err = New.loc[:, 'CRONUS_External_2020_03_27'].values
 standard_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
 
 # plot the curve, Monte Carlo ODR
-pl1 = monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
+Beta, Eps, Covariance, counts, pl1 = monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_err, new_y_err)
+
+# plots model values
+plot_coefficients(Beta, Eps, Covariance)
+
+
 
 
 
