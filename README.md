@@ -2,9 +2,8 @@
 Data and code for the above paper, published in *Journal Name*, available at: www.google.com
 
 <p align="center">
-	<img width = "460" src="figures/Figure_5_900dpi.png"
+	<img width = "460" src="images/github_logo.png"
 </p>
-<div align="center">Monte Carlo simulated Orthogonal Distance Regression of 54 TCN-SH calibration points</div>
 
 ### Abstract
 
