@@ -205,7 +205,8 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     # export the figure
     fig.set_size_inches(3.2, 3.2)
-    savefig('Pyrenees_Monte_Carlo_ODR.png', dpi = 900, bbox_inches='tight')
+    #savefig('Pyrenees_Monte_Carlo_ODR.png', dpi = 900, bbox_inches='tight')
+    savefig('Pyrenees_Monte_Carlo_ODR.svg')
 
     # Return final model coefficients
     return Beta, Eps, Covariance
@@ -255,8 +256,8 @@ Be = pd.read_csv('data\Supplementary_Table_1_10Be.csv', encoding = "ISO-8859-1")
 Cl = pd.read_csv('data\Supplementary_Table_2_36Cl.csv', encoding = "ISO-8859-1")
 # Simplifies to key variables
 cols = ['Group', 'Landform/Region','Publication', 'Isotope', 'Facility', 'Sample_name',
-        'SH_Mean','SH_SEM','SH_STD', 'SH_Percent', 'CRONUS_Age_2020_03_27','CRONUS_Internal_2020_03_27',
-        'CRONUS_External_2020_03_27', 'Age_Percent']
+        'SH_Mean','SH_SEM','SH_STD', 'CRONUS_Age_2020_03_27','CRONUS_Internal_2020_03_27',
+        'CRONUS_External_2020_03_27']
 Be = Be[cols]
 Cl = Cl[cols]
 
