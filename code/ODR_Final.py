@@ -84,7 +84,7 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     1) Randomises the data (i = 1000) based on values (x, y) and associated errors (x_err, y_err).
     2) Constructs a standard logged OLS regression (used for ODR beta estimates).
-    3) Detects outliers using internally studentised residuals from the OLS.  Those > 2 sigma are rejected. 
+    3) Detects outliers using internally studentised residuals from the OLS.  Those > 2 sigma (95%) are rejected. 
     4) Constructs an ODR and saves model coefficients (beta, covariance matrix, errors)
     5) Takes the median coefficients for final ODR model construction  
     
@@ -159,6 +159,7 @@ def monte_carlo_odr(x_data, y_data, x_err, y_err, new_x_data, new_y_data, new_x_
 
     # fit model using new beta, original x scale for consistency
     xn = linspace(min(x_data), max(x_data), 1000)
+
     yn = log_func(Beta, xn)
 
     # 1 and 2 sigma prediction intervals
