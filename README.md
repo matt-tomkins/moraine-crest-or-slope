@@ -11,8 +11,11 @@ Data and code for the above paper, published in *Journal Name*, available at: ww
 
 Folders include:
 
-- **code**: Python code used for Monte Carlo simulated Orthogonal Distance Regression (ODR)
-- **data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders
+- **code**: The following Python files are included:
+	-  Monte Carlo simulated Orthogonal Distance Regression (*MC_Orthogonal_Distance_Regression.py*)
+	-  Code for Monte Carlo simulation of calibrated boulder exposure ages (*MC_Simulated_Ages.py*)
+	-  Code for global and local Morans *I* spatial-autocorrelation of simulated SH datasets (*MC_Spatial_Autocorrelation.py*)
+- **data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders. Also included are the simulated Schmidt hammer datasets for each landform.
 - **figures**: Latest manuscript figures 
 - **images**: Supplementary figures
 - **manuscript**: Latest version of the above paper (pre-peer review)
