@@ -1,34 +1,55 @@
+'''
+author: 
+
+Code to perform iterative global and local Moran spatial autocorrelation on
+MC simulated datasets.
+
+Analysis of 6 landforms, each with 1000 simulated datasets.
+
+Intended outcomes:
+    - For each dataset, the results of global Morans I i.e. is there stat.
+    signif. spatial clustering?
+    - If yes, the results of local Morans I with a record of cluster locations
+    (Voronoi polygons).
+    - For each landform, a record of clustering frequency (i.e. # signif. / 1000). 
+
+Sources:
+    - 
+
+'''
+
 # Loops through each landform
 
     # Loops through each simulated dataset (n = 1000)
 
         # Performs global Morans I
 
-        # If simulated p is < 0.05, then significant. Record +1 for signif.
+        # Stores result and modelled p value
+
+        # If simulated p is < 0.05:
+
+            # Add to result Significant += 1
 
             # Perform local Morans I
 
             # Record the locations of significant clusters
 
-        # else (p > 0.05), Record +1 for not signif.
+        # Else (simulated p > 0.05:
+
+            # Add to result Not-Significant += 1
 
     
 '''
 
-At the end, we should have:
+At the end, we should we able to ask the following:
 
-    (1) a record of the clustering frequency for each landform.
-        number of significant datasets / 1000. Does the degree of clustering
-        vary?
+    (1) Does the degree of clustering vary between landforms?
 
-            Yes...
+    (2) Where are the good/bad boulder clusters?
 
-    (2) the locations of "good" and "bad" clusters. These can presented
-        as a proportion of the total dataset. If one cell is identified
-        as a cluster in 65 datasets, this would display as 6.5%.
-        Another identified as a cluster in 782 datasets = 78.2%.
-
-            Where are the clusters? On the crest or elsewhere?
+        - This can either be presented as a true value (e.g. this voronoi polygon
+        was a cluster n times.
+        - OR proportionally (e.g. the polygon was a cluster in n % of iterations). 
 
 
 
