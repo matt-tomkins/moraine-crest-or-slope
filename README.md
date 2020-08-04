@@ -13,9 +13,10 @@ Folders include:
 
 - **code**: The following Python files are included:
 	-  Monte Carlo simulated Orthogonal Distance Regression (*MC_Orthogonal_Distance_Regression.py*)
-	-  Code for Monte Carlo simulation of calibrated boulder exposure ages (*MC_Simulated_Ages.py*)
-	-  Code for global and local Morans *I* spatial-autocorrelation of simulated SH datasets (*MC_Spatial_Autocorrelation.py*)
-- **data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders. Also included are the simulated Schmidt hammer datasets for each landform.
+	-  Code for global and local Morans *I* spatial-autocorrelation
+- **data**: Supplementary tables for <sup>10</sup>Be, <sup>36</sup>Cl and Schmidt hammer sampled boulders. Also included are:
+	- Shapefiles representing the extents of the moraine sampling areas and associated Voronoi polygons
+	- Input data for the Probabilistic Cosmogenic Age Analysis Tool (P-CAAT; Dortch *et al*. 2020) and output Matlab figures (.fig)
 - **figures**: Latest manuscript figures 
 - **images**: Supplementary figures
 - **manuscript**: Latest version of the above paper (pre-peer review)
