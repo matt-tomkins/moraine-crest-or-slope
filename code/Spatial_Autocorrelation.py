@@ -8,6 +8,7 @@ Command to run:
     python Spatial_Autocorrelation.py > ../data/out/moran.txt
 """
 
+from pandas import read_csv
 from os import path, makedirs
 from geopandas import read_file
 from pysal.lib.weights import Queen
@@ -49,11 +50,18 @@ if not path.exists('../data/out/shapefiles'):
 if not path.exists('../data/out/figures'):
     makedirs('../data/out/figures')
 
+# open csv file of ages
+ages = read_csv('../data/Supplementary_Table_3_SH.csv', encoding='latin-1')[['Sample_name', 'General_Class_1sigma', 'General_Class_2sigma', 'General_Class_3sigma']]
+
 # loop through moraines
 for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 'Tallada']:
 
     # open file and create copy to write results
     moraine = read_file(f'../data/Shapefiles/Voronoi/{f}_Voronoi.shp')
+
+    # merge (join) the age data
+    moraine = moraine.merge(ages, how='inner', left_on="Sample_nam", right_on="Sample_name")
+
     result = moraine.copy()
 
     # calculate and row standardise weights matrix
@@ -61,7 +69,7 @@ for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 
     W.transform = 'r'
 
     # loop through the columns
-    for s in ['General_1s', 'General_2s', 'General_3s']:
+    for s in ['General_Class_1sigma', 'General_Class_2sigma', 'General_Class_3sigma']:
 
         # calculate and report global I
         mi = Moran(moraine[s].apply(lambda x : 1 if x == 'Good' else 0), W, permutations=9999)
@@ -86,7 +94,7 @@ for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 
         # update GeoDataFrame
         # result['Morans_I'] = lisa.Is                                                      # value of Moran's I
         # result['sig'] = lisa.p_sim                                                        # simulated p
-        result[s.replace('General', 'Quad')] = getQuadrants(lisa.q, lisa.p_sim, 0.05)   # quadrant (HH, HL, LH, LL)
+        result[s.replace('General_Class', 'Quad')] = getQuadrants(lisa.q, lisa.p_sim, 0.05)   # quadrant (HH, HL, LH, LL)
 
         # combined plot for local moran (plot, save, close)
         try:
