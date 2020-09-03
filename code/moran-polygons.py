@@ -5,7 +5,7 @@ Perform Spatial Autocorrelation and LISA analysis on voroni polygons around samp
 author: jonnyhuck
 
 Command to run:
-    python Spatial_Autocorrelation.py > ../data/out/moran.txt
+    python Spatial_Autocorrelation.py > ../data/out/moran-polygons.txt
 """
 
 from pandas import read_csv
@@ -48,12 +48,10 @@ def getQuadrants(qs, sigs, acceptableSig):
 seed(1824)
 
 # make sure output directory is there
-if not path.exists('../data/out'):
-    makedirs('../data/out/')
-if not path.exists('../data/out/shapefiles'):
-    makedirs('../data/out/shapefiles')
-if not path.exists('../data/out/figures'):
-    makedirs('../data/out/figures')
+if not path.exists('../data/out/shapefiles/moran/polygons'):
+    makedirs('../data/out/shapefiles/moran/polygons')
+if not path.exists('../data/out/figures/moran/polygons'):
+    makedirs('../data/out/figures/moran/polygons')
 
 # open csv file of ages
 ages = read_csv('../data/Supplementary_Table_3_SH.csv', encoding='latin-1')[['Sample_name',
@@ -87,7 +85,7 @@ for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 
         # scatterplot for global moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(mi)
-            savefig(f'../data/out/figures/moran_{f}_{s}.png')
+            savefig(f'../data/out/figures/moran/polygons/moran_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -104,7 +102,7 @@ for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 
         # combined plot for local moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(lisa, p=0.05)
-            savefig(f'../data/out/figures/lisa_{f}_{s}.png')
+            savefig(f'../data/out/figures/moran/polygons/lisa_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -112,6 +110,6 @@ for f in ['Arànser_Left', 'Arànser_Right', 'Outer_Pleta_Naua', 'Soum_dEch', 
             pass
 
     # output shapefile
-    result.to_file("../data/out/shapefiles/" + f + ".shp")
+    result.to_file("../data/out/shapefiles/moran/polygons/" + f + ".shp")
 
 print("done")

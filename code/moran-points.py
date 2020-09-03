@@ -50,10 +50,10 @@ def getQuadrants(qs, sigs, acceptableSig):
 seed(1824)
 
 # make sure output directory is there
-if not path.exists('../data/out/shapefiles/points'):
-    makedirs('../data/out/shapefiles/points')
-if not path.exists('../data/out/figures/points'):
-    makedirs('../data/out/figures/points')
+if not path.exists('../data/out/shapefiles/moran/points'):
+    makedirs('../data/out/shapefiles/moran/points')
+if not path.exists('../data/out/figures/moran/points'):
+    makedirs('../data/out/figures/moran/points')
 
 
 # open csv file of ages
@@ -88,13 +88,13 @@ for f in ages.Landform.unique():
         mi = Moran(moraine[s].apply(lambda x : 1 if x == 'Good' else 0), W, permutations=9999)
         print(f"\nGlobal Moran's I Results for {f}: {s}")
         print("I:\t\t\t", mi.I)					   # value of Moran's I
-        print("Expected I:\t\t", mi.EI)			   # expected Moran's I
+        print("Expected I:\t\t", mi.EI)			   # expected Moran's I·
         print("Simulated p:\t\t", mi.p_sim, "\n")  # simulated p
 
         # scatterplot for global moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(mi)
-            savefig(f'../data/out/figures/points/moran_{f}_{s}.png')
+            savefig(f'../data/out/figures/moran/points/moran_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -111,7 +111,7 @@ for f in ages.Landform.unique():
         # plot local moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(lisa, p=0.05)
-            savefig(f'../data/out/figures/points/lisa_{f}_{s}.png')
+            savefig(f'../data/out/figures/moran/points/lisa_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -119,6 +119,6 @@ for f in ages.Landform.unique():
             pass
 
     # output shapefile
-    result.to_file("../data/out/shapefiles/points/" + f + ".shp")
+    result.to_file("../data/out/shapefiles/moran/points/" + f + ".shp")
 
 print("done")
