@@ -19,6 +19,8 @@ from pysal.viz.splot.esda import moran_scatterplot
 from matplotlib.pyplot import savefig, close as plt_close
 from pysal.lib.weights.util import min_threshold_distance
 
+from pointpats import PointPattern
+
 
 def getQuadrants(qs, sigs, acceptableSig):
     """
@@ -73,10 +75,24 @@ for f in ages.Landform.unique():
 
     # make a copy for writing results to
     result = moraine.copy()
+    
+    '''
+    
+    # Calculates distance to two nearest neighbours
+    neighbour_distances = pp.knn(2)
+    
+    # Finds mininum distance to ensure each point has at least two neighbours
+    d = min(neighbour_distances[,2])
+    
+    W = DistanceBand.from_dataframe(moraine, threshold=d, binary=False)
+    
+    '''
 
     # calculate weights using minimum nearest neighbour distance threshold
     W = DistanceBand.from_dataframe(moraine, threshold=min_threshold_distance(
         [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]), binary=False)
+        
+    
 
     # perform row standardisation (so all weights in a row add up to 1)
     W.transform = 'r'
