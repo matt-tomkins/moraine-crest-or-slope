@@ -5,7 +5,7 @@ Perform Spatial Autocorrelation and LISA analysis on voroni polygons around samp
 author: jonnyhuck
 
 Command to run:
-    python Spatial_Autocorrelation.py > ../data/out/moran-polygons.txt
+    python moran-polygons.py > ../data/out/moran-polygons.txt
 """
 
 from pandas import read_csv
