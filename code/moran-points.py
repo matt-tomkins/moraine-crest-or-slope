@@ -87,6 +87,8 @@ for f in ages.Landform.unique():
         [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]).knn(2)[1],
         key=itemgetter(1))[1], binary=False)
 
+    # print(W.cardinalities)  # you can use this to see how many neighbours each observation has
+
     # perform row standardisation (so all weights in a row add up to 1)
     W.transform = 'r'
 
