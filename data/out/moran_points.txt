@@ -1,62 +1,62 @@
 
 Global Moran's I Results for Soum d'Ech: General_Class_1sigma
-I:			 0.09529184700729854
+I:			 0.11709576692720056
 Expected I:		 -0.010101010101010102
-Simulated p:		 0.0585 
+Simulated p:		 0.028 
 
 
 Global Moran's I Results for Soum d'Ech: General_Class_2sigma
-I:			 0.1628585588691424
+I:			 0.15188860017235564
 Expected I:		 -0.010101010101010102
-Simulated p:		 0.0072 
+Simulated p:		 0.0106 
 
 
 Global Moran's I Results for Soum d'Ech: General_Class_3sigma
-I:			 0.07515010956153999
+I:			 0.09686824258789306
 Expected I:		 -0.010101010101010102
-Simulated p:		 0.1016 
+Simulated p:		 0.0572 
 
 
 Global Moran's I Results for Tallada: General_Class_1sigma
-I:			 -0.05261610244258813
+I:			 -0.020362390856531454
 Expected I:		 -0.014492753623188406
-Simulated p:		 0.3114 
+Simulated p:		 0.4872 
 
 
 Global Moran's I Results for Tallada: General_Class_2sigma
-I:			 0.05470626245359073
+I:			 0.0979609279485812
 Expected I:		 -0.014492753623188406
-Simulated p:		 0.1599 
+Simulated p:		 0.0719 
 
 
 Global Moran's I Results for Tallada: General_Class_3sigma
-I:			 -0.005314065198230335
+I:			 -0.005321215257282889
 Expected I:		 -0.014492753623188406
-Simulated p:		 0.3734 
+Simulated p:		 0.3761 
 
 
 Global Moran's I Results for Arànser Left: General_Class_1sigma
-I:			 0.06809468287929996
+I:			 0.08059514783619266
 Expected I:		 -0.0036496350364963502
-Simulated p:		 0.0285 
+Simulated p:		 0.0136 
 
 
 Global Moran's I Results for Arànser Left: General_Class_2sigma
-I:			 0.08699230635000117
+I:			 0.09146029588660692
 Expected I:		 -0.0036496350364963502
-Simulated p:		 0.0095 
+Simulated p:		 0.0064 
 
 
 Global Moran's I Results for Arànser Left: General_Class_3sigma
-I:			 0.12238013397800691
+I:			 0.12479748004302826
 Expected I:		 -0.0036496350364963502
-Simulated p:		 0.0009 
+Simulated p:		 0.0008 
 
 
 Global Moran's I Results for Outer Pleta Naua: General_Class_1sigma
-I:			 -0.14960312069161827
+I:			 -0.14485150320775977
 Expected I:		 -0.01694915254237288
-Simulated p:		 0.0129 
+Simulated p:		 0.0246 
 
 
 Global Moran's I Results for Outer Pleta Naua: General_Class_2sigma
@@ -72,20 +72,20 @@ Simulated p:		 0.0001
 
 
 Global Moran's I Results for Arànser Right: General_Class_1sigma
-I:			 -0.021562018209353762
+I:			 0.0051862644050298095
 Expected I:		 -0.007751937984496124
-Simulated p:		 0.4249 
+Simulated p:		 0.4022 
 
 
 Global Moran's I Results for Arànser Right: General_Class_2sigma
-I:			 0.03813292635077954
+I:			 0.06514263803439509
 Expected I:		 -0.007751937984496124
-Simulated p:		 0.221 
+Simulated p:		 0.1194 
 
 
 Global Moran's I Results for Arànser Right: General_Class_3sigma
-I:			 0.038954804922790624
+I:			 0.07161660451594003
 Expected I:		 -0.007751937984496124
-Simulated p:		 0.2051 
+Simulated p:		 0.1033 
 
 done

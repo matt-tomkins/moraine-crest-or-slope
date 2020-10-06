@@ -21,8 +21,6 @@ from pysal.viz.splot.esda import moran_scatterplot
 from matplotlib.pyplot import savefig, close as plt_close
 # from pysal.lib.weights.util import min_threshold_distance
 
-from pointpats import PointPattern
-
 
 def getQuadrants(qs, sigs, acceptableSig):
     """
@@ -66,25 +64,28 @@ ages = read_csv('../data/Supplementary_Table_3_SH.csv', encoding='latin-1')[['Sa
     'General_Class_3sigma']]
 
 # create geodataframe from the csv dataset
-moraines = GeoDataFrame( ages, crs={'init': 'epsg:4326'},
+moraines = GeoDataFrame( ages, crs='epsg:4326',
     geometry=[Point(xy) for xy in zip(ages.Longitude_DD, ages.Latitude_DD)])
 
 # loop through moraines
 for f in ages.Landform.unique():
 
-    # select just the current moraine
-    moraine = moraines[moraines.Landform == f]
+    # get the appropriate projection code for each moraine
+    proj = "32630" if f == "Soum d'Ech" else "32631"
+
+    # select just the current moraine and project as appropriate
+    moraine = moraines[moraines.Landform == f].to_crs("epsg:"+proj)
 
     # make a copy for writing results to
     result = moraine.copy()
 
     # calculate weights using minimum nearest neighbour distance threshold with one neighbour
     # W = DistanceBand.from_dataframe(moraine, threshold=min_threshold_distance(
-    #     [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)], binary=False)
+    #     [[x, y] for x, y in zip(moraine.geometry.x, moraine.geometry.y)], binary=False)
 
     # calculate weights using minimum nearest neighbour distance threshold with knn
     W = DistanceBand.from_dataframe(moraine, threshold=max(PointPattern(
-        [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]).knn(2)[1],
+        [[x, y] for x, y in zip(moraine.geometry.x, moraine.geometry.y)]).knn(2)[1],
         key=itemgetter(1))[1], binary=False)
 
     # print(W.cardinalities)  # you can use this to see how many neighbours each observation has
