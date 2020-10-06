@@ -13,11 +13,12 @@ from numpy.random import seed
 from os import path, makedirs
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
+from pointpats import PointPattern
 from pysal.lib.weights import DistanceBand
 from pysal.explore.esda import Moran, Moran_Local
 from pysal.viz.splot.esda import moran_scatterplot
 from matplotlib.pyplot import savefig, close as plt_close
-from pysal.lib.weights.util import min_threshold_distance
+# from pysal.lib.weights.util import min_threshold_distance
 
 from pointpats import PointPattern
 
@@ -88,11 +89,24 @@ for f in ages.Landform.unique():
     
     '''
 
+    # new version - everyone has at least two neighbours
+    pp = PointPattern([[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)])
+    print(pp.knn(2)[1])
+    exit()
+
+    # old version - everyone has at leat one neighbour
+    # knn_threshold = min_threshold_distance(
+    #     [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)])
+
     # calculate weights using minimum nearest neighbour distance threshold
+<<<<<<< Updated upstream
     W = DistanceBand.from_dataframe(moraine, threshold=min_threshold_distance(
         [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]), binary=False)
         
     
+=======
+    W = DistanceBand.from_dataframe(moraine, threshold=knn_threshold, binary=False)
+>>>>>>> Stashed changes
 
     # perform row standardisation (so all weights in a row add up to 1)
     W.transform = 'r'
