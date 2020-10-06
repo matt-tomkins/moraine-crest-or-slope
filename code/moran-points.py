@@ -5,19 +5,21 @@ Perform Spatial Autocorrelation and LISA analysis on points at sample locations
 author: jonnyhuck
 
 Command to run:
-    python Spatial_Autocorrelation.py > ../data/out/moran-points.txt
+    python moran_points.py > ../data/out/moran-points.txt
 """
 
 from pandas import read_csv
 from numpy.random import seed
 from os import path, makedirs
+from operator import itemgetter
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
+from pointpats import PointPattern
 from pysal.lib.weights import DistanceBand
 from pysal.explore.esda import Moran, Moran_Local
 from pysal.viz.splot.esda import moran_scatterplot
 from matplotlib.pyplot import savefig, close as plt_close
-from pysal.lib.weights.util import min_threshold_distance
+# from pysal.lib.weights.util import min_threshold_distance
 
 from pointpats import PointPattern
 
@@ -75,24 +77,17 @@ for f in ages.Landform.unique():
 
     # make a copy for writing results to
     result = moraine.copy()
-    
-    '''
-    
-    # Calculates distance to two nearest neighbours
-    neighbour_distances = pp.knn(2)
-    
-    # Finds mininum distance to ensure each point has at least two neighbours
-    d = min(neighbour_distances[,2])
-    
-    W = DistanceBand.from_dataframe(moraine, threshold=d, binary=False)
-    
-    '''
 
-    # calculate weights using minimum nearest neighbour distance threshold
-    W = DistanceBand.from_dataframe(moraine, threshold=min_threshold_distance(
-        [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]), binary=False)
-        
-    
+    # calculate weights using minimum nearest neighbour distance threshold with one neighbour
+    # W = DistanceBand.from_dataframe(moraine, threshold=min_threshold_distance(
+    #     [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)], binary=False)
+
+    # calculate weights using minimum nearest neighbour distance threshold with knn
+    W = DistanceBand.from_dataframe(moraine, threshold=max(PointPattern(
+        [[x, y] for x, y in zip(moraine.Longitude_DD, moraine.Latitude_DD)]).knn(2)[1],
+        key=itemgetter(1))[1], binary=False)
+
+    # print(W.cardinalities)  # you can use this to see how many neighbours each observation has
 
     # perform row standardisation (so all weights in a row add up to 1)
     W.transform = 'r'
