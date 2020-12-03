@@ -1,1 +1,0 @@
-<pysal.lib.weights.distance.KNN object at 0x7fde265ce5b0>
