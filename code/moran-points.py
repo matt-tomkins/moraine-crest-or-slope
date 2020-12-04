@@ -52,10 +52,10 @@ def getQuadrants(qs, sigs, acceptableSig):
 seed(1824)
 
 # make sure output directory is there
-if not path.exists('../data/out/shapefiles/moran/points'):
-    makedirs('../data/out/shapefiles/moran/points')
-if not path.exists('../data/out/figures/moran/points'):
-    makedirs('../data/out/figures/moran/points')
+if not path.exists('../data/Moran/shapefiles'):
+    makedirs('../data/Moran/shapefiles')
+if not path.exists('../data/Moran/figures'):
+    makedirs('../data/Moran/figures')
 
 
 # open csv file of ages
@@ -106,7 +106,7 @@ for f in ages.Landform.unique():
         # scatterplot for global moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(mi)
-            savefig(f'../data/out/figures/moran/points/moran_{f}_{s}.png')
+            savefig(f'../data/Moran/figures/moran_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -123,7 +123,7 @@ for f in ages.Landform.unique():
         # plot local moran (plot, save, close)
         try:
             fig, ax = moran_scatterplot(lisa, p=0.05)
-            savefig(f'../data/out/figures/moran/points/lisa_{f}_{s}.png')
+            savefig(f'../data/Moran/figures/lisa_{f}_{s}.png')
             plt_close(fig)
         except:
             # lazily ignore error and carry on - this is caused by nan value for
@@ -131,6 +131,6 @@ for f in ages.Landform.unique():
             pass
 
     # output shapefile
-    result.to_file("../data/out/shapefiles/moran/points/" + f + ".shp")
+    result.to_file("../data/Moran/shapefiles/" + f + ".shp")
 
 print("done")
